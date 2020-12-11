@@ -126,7 +126,7 @@ class my_thread(Thread):
     def do_drag(self, tasks, train_id):
         for task in tasks:
             name = tasks[task]['name']
-            self.mprint('Task:{}'.format(name))
+            self.mprint('Drag:{}'.format(name))
             answer = tasks[task]['answer']
 
             url = 'http://www.ibodao.com/User/Task/start/task_id/{}/train_id/{}.html'.format(
@@ -137,7 +137,9 @@ class my_thread(Thread):
             }
             self.mprint('Start: Get request')
             response = self.s.get(url, headers=headers)
-            if '重新挑战' in response.text:
+            soup = BeautifulSoup(response.text, 'lxml')
+            text = soup.find('i', class_='icon icon-jinxingzhong').get_text()
+            if '重新挑战' == text:
                 self.mprint('已经挑战过了')
                 continue
 
