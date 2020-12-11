@@ -67,7 +67,7 @@ class my_thread(Thread):
             diffculty = lessons[lesson]['base_info']['diffculty']
             videos = lessons[lesson]['base_info']['videos']
             tasks = lessons[lesson]['base_info']['tasks']
-            if direction not in ["互联网", "电子商务基础", "网络营销基础", "SEO/SEM", "微博营销", "微信营销"]:
+            if direction not in ["互联网", "电子商务基础", "网络营销基础", "SEO/SEM", "微博营销", "微信营销",'新媒体营销','软文/内容营销','邮件/IM/知识营销','其他']:
                 self.mprint(direction+" 不在需要完成的内容里")
                 continue
             self.mprint('---正在进行{} 难度{} 方向：{} 视频：{} 实训：{}---'.format(name,

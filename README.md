@@ -20,4 +20,5 @@ ibodao对视频没有防作弊的机制，训练题的拖拽题可以直接请�
 |`main.py`|刷题的主程序|
   
 ## 使用方法
-在`main.py`中的`main`函数里添加自己的帐号和密码，然后`python main.py`
+1. 安装依赖 `python -m pip install -r requirements.txt`
+2. 在`main.py`中的`main`函数里添加自己的帐号和密码，然后`python main.py`
