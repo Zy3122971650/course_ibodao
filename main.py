@@ -183,27 +183,7 @@ class my_thread(Thread):
 
             ###
             # 构造answer
-            headers = {
-                'X-Requested-With': 'XMLHttpRequest',
-
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            }
-            url = 'http://www.ibodao.com/User/task/discuss/task_id/{}.html'.format(
-                task)
-            json_data = self.s.get(url, headers=headers).text
-            soup = BeautifulSoup(json.loads(json_data)['data'], 'lxml')
-            all_answer = soup.find_all('div', class_='clearfix commentRight')
-            length_1 = 0
-            for a in all_answer:
-                text = a.find('p').get_text()
-                length = len(text)
-                if length > length_1:
-                    answer = text
-                    length_1 = length
-
-            self.mprint(answer)
-            time.sleep(2)
-
+            answer = tasks[task]['answer']
             ###
             headers = {
                 'X-Requested-With': 'XMLHttpRequest',
@@ -218,6 +198,7 @@ class my_thread(Thread):
             self.mprint('info: Post answer')
             self.s.post(url, headers=headers,
                         data=data, verify=False)
+
 
 
 def main():
