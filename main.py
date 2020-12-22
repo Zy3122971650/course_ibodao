@@ -5,6 +5,11 @@ import random
 from threading import Thread
 from bs4 import BeautifulSoup
 
+DRAGE_WAIT_START = 30
+DRAGE_WAIT_END = 40
+DOC_WAIT_START = 120
+DOC_WAIT_END = 300
+
 
 class my_thread(Thread):
     def __init__(self, user_info):
@@ -47,7 +52,7 @@ class my_thread(Thread):
         }
 
         self.s.post('http://www.ibodao.com/Member/login.html',
-                                 headers=headers, data=data, verify=False)
+                    headers=headers, data=data, verify=False)
 
         self.mprint('cookie初始化成功')
 
@@ -67,7 +72,7 @@ class my_thread(Thread):
             diffculty = lessons[lesson]['base_info']['diffculty']
             videos = lessons[lesson]['base_info']['videos']
             tasks = lessons[lesson]['base_info']['tasks']
-            if direction not in ["互联网", "电子商务基础", "网络营销基础", "SEO/SEM", "微博营销", "微信营销",'新媒体营销','软文/内容营销','邮件/IM/知识营销','其他']:
+            if direction not in ["互联网", "电子商务基础", "网络营销基础", "SEO/SEM", "微博营销", "微信营销", '新媒体营销', '软文/内容营销', '邮件/IM/知识营销', '其他']:
                 self.mprint(direction+" 不在需要完成的内容里")
                 continue
             self.mprint('---正在进行{} 难度{} 方向：{} 视频：{} 实训：{}---'.format(name,
@@ -81,7 +86,7 @@ class my_thread(Thread):
             name = videos[video]['name']
             self.mprint('Video:{}'.format(name))
             totol_time = videos[video]['total_time']
-
+            # 激活视频记录
             data = {
                 'id': video,
                 'cid': ''
@@ -92,14 +97,40 @@ class my_thread(Thread):
 
             self.s.post('http://www.ibodao.com/video/playvideo.html',
                         headers=headers, data=data, verify=False)
+            # 检测是否完成
+            url = 'http://www.ibodao.com/Video/info/id/{}/tid/{}.html'.format(
+                video, train_id)
+            headers = {
+                'Upgrade-Insecure-Requests': '1',
+            }
+            response = self.s.get(url, headers=headers)
+            self.mprint('URL：{}，\nResponse------>'.format(url), end='')
+            txt_lst = response.text.split('\n')
+            txt_lst.reverse()
+            for t in txt_lst:
+                flag = 0
+                if 'my_study_time = parseInt' in t:
+                    code = ('def parseInt(a):return a\n')
+                    exec(code+t.strip('\n \r , '))
+                    if locals()['my_study_time'] == totol_time:
+                        flag = 1
+                        self.mprint('ok')
+                        break
+            if flag == 1:
+                continue
 
+            # 上传视频记录
+            time.sleep(int(totol_time))
             url = 'http://www.ibodao.com/video/research_time.html?id={}&cid=&research_time={}&claid=0'.format(
                 video, totol_time)
             headers = {
                 'X-Requested-With': 'XMLHttpRequest'
             }
+            response = self.s.get(url, headers=headers)
+            if response.text == '1':
+                self.mprint('ok')
 
-            self.mprint('URL：{}，\nResponse------>'.format(url), end='')
+            """
             response = self.s.get(url, headers=headers)
             if response.text == '1':
                 self.mprint('ok')
@@ -122,6 +153,7 @@ class my_thread(Thread):
                             self.mprint('error')
             self.mprint('sleep 2s')
             time.sleep(1)
+            """
 
     def do_drag(self, tasks, train_id):
         for task in tasks:
@@ -144,7 +176,7 @@ class my_thread(Thread):
                 continue
 
             self.mprint('Sleep: Wait 2s')
-            time.sleep(2)
+            time.sleep(range(DRAGE_WAIT_START, DRAGE_WAIT_END))
 
             headers = {
                 'X-Requested-With': 'XMLHttpRequest',
@@ -182,7 +214,7 @@ class my_thread(Thread):
             if '重新挑战' in response.text:
                 self.mprint('已经挑战过了')
                 continue
-
+            time.sleep(range(DOC_WAIT_START, DOC_WAIT_END))
             ###
             # 构造answer
             answer = tasks[task]['answer']
@@ -200,7 +232,6 @@ class my_thread(Thread):
             self.mprint('info: Post answer')
             self.s.post(url, headers=headers,
                         data=data, verify=False)
-
 
 
 def main():
